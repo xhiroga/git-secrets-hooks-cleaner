@@ -133,7 +133,7 @@ var listCmd = &cobra.Command{
 		sugar := logger.Sugar()
 		sugar.Debugf("Verbose: %v", verbose)
 
-		baseDir, _ := cmd.Flags().GetString("base-dir")
+		baseDir, _ := cmd.Flags().GetString("base")
 		sugar.Debugf("Base dir: %s", baseDir)
 
 		if baseDir == "" {
@@ -152,6 +152,6 @@ var listCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-	listCmd.Flags().String("base-dir", "", "Base directory to search for hooks")
+	listCmd.Flags().String("base", "", "Base directory to search for hooks")
 	listCmd.Flags().Bool("verbose", false, "Verbose output")
 }
