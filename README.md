@@ -4,6 +4,9 @@ After uninstalling [`git-secrets`](https://github.com/awslabs/git-secrets), [dev
 
 ## Usage
 
+```shell
+./git-secrets-hooks-cleaner list
+```
 
 
 ## Note
@@ -15,4 +18,14 @@ go run main.go
 
 go build
 ./git-secrets-hooks-cleaner
+
+make install
+which git-secrets-hooks-cleaner
+git-secrets-hooks-cleaner list
+
+make uninstall
+which git-secrets-hooks-cleaner
 ```
+
+## Reference
+
