@@ -4,7 +4,6 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -28,10 +27,10 @@ var listCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		verbose, _ := cmd.Flags().GetBool("verbose")
-		fmt.Println(verbose)
 		logger := getLogger(verbose)
 		defer logger.Sync() // flushes buffer, if any
 		sugar := logger.Sugar()
+		sugar.Debugf("Verbose: %v", verbose)
 
 		baseDir, _ := cmd.Flags().GetString("base-dir")
 		sugar.Debugf("Base dir: %s", baseDir)
@@ -42,9 +41,30 @@ var listCmd = &cobra.Command{
 			baseDir = currentDir
 		}
 
-		matches, _ := filepath.Glob(baseDir + "/**/.git/hooks/*")
-		sugar.Debugf("Found %d hooks", len(matches))
-		sugar.Debug(matches)
+		// filepath.Glob doesn't support **, so we need to walk the directory
+		// https://stackoverflow.com/a/26809999/7869792
+
+		var files []string
+		err := filepath.WalkDir(baseDir, func(path string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() {
+				return nil
+			}
+			if filepath.Base(filepath.Dir(path)) == "hooks" {
+				sugar.Debugf("Found file: %s", path)
+				files = append(files, path)
+			}
+			return nil
+		})
+		if err != nil {
+			sugar.Fatalf("Error walking directory: %s", err)
+		}
+
+		// matches, _ := filepath.Glob(baseDir + "/**/.git/hooks/*")
+		// sugar.Debugf("Found %d hooks", len(matches))
+		// sugar.Debug(matches)
 	},
 }
 
