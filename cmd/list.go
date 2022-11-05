@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 @xhiroga
 */
 package cmd
 
@@ -27,8 +27,8 @@ type UseGitSecrets int
 
 const (
 	No UseGitSecrets = iota
-	Modified
 	TemplateCompatible
+	Modified
 )
 
 var commitMsgTemplate = `#!/usr/bin/env bash
@@ -112,10 +112,10 @@ func showHooks(hooks []hook) {
 		switch hook.useGitSecrets {
 		case No:
 			color.Green("No")
-		case Modified:
-			color.Yellow("Modified")
 		case TemplateCompatible:
-			color.Red("Template compatible")
+			color.Yellow("Template compatible")
+		case Modified:
+			color.Red("Modified")
 		}
 	}
 }
@@ -123,8 +123,8 @@ func showHooks(hooks []hook) {
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "",
-	Long:  ``,
+	Short: "Show git hooks that use git-secrets",
+	Long:  `Show git hooks that use git-secrets`,
 	Run: func(cmd *cobra.Command, args []string) {
 		verbose, _ := cmd.Flags().GetBool("verbose")
 		logger := getLogger(verbose)
