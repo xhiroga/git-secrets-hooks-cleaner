@@ -87,7 +87,7 @@ func getHooks(baseDir string, sugar *zap.SugaredLogger) ([]hook, error) {
 		if d.IsDir() {
 			return nil
 		}
-		if filepath.Base(filepath.Dir(path)) == "hooks" {
+		if filepath.Base(filepath.Dir(filepath.Dir(path))) == ".git" && filepath.Base(filepath.Dir(path)) == "hooks" {
 			sugar.Debugf("Found file: %s", path)
 			useGitSecrets, err := doesUseGitSecrets(path)
 			if err != nil {
@@ -107,7 +107,6 @@ func getHooks(baseDir string, sugar *zap.SugaredLogger) ([]hook, error) {
 
 func showHooks(hooks []hook) {
 	fmt.Println("Path\tUse git-secrets")
-	fmt.Println("----\t--------------")
 	for _, hook := range hooks {
 		fmt.Printf("%s\t", hook.path)
 		switch hook.useGitSecrets {
