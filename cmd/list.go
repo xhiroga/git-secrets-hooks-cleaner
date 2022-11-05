@@ -20,6 +20,33 @@ func getLogger(verbose bool) *zap.Logger {
 	return logger
 }
 
+var commitMsgTemplate = `#!/usr/bin/env bash
+git secrets --commit_msg_hook -- "$@"
+`
+var preCommitTemplate = `#!/usr/bin/env bash
+git secrets --pre_commit_hook -- "$@"
+`
+var prepareCommitMsg = `#!/usr/bin/env bash
+git secrets --prepare_commit_msg_hook -- "$@"
+`
+
+func isFromTemplate(path string) (bool, error) {
+	bytes, err := os.ReadFile(path)
+	if err != nil {
+		return false, err
+	}
+	content := string(bytes)
+	switch filepath.Base(path) {
+	case "commit-msg":
+		return content == commitMsgTemplate, nil
+	case "pre-commit":
+		return content == preCommitTemplate, nil
+	case "prepare-commit-msg":
+		return content == prepareCommitMsg, nil
+	}
+	return false, nil
+}
+
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
@@ -54,6 +81,11 @@ var listCmd = &cobra.Command{
 			}
 			if filepath.Base(filepath.Dir(path)) == "hooks" {
 				sugar.Debugf("Found file: %s", path)
+				fromTemplate, err := isFromTemplate(path)
+				if err != nil {
+					return err
+				}
+				sugar.Debugf("From template: %v", fromTemplate)
 				files = append(files, path)
 			}
 			return nil
@@ -61,10 +93,6 @@ var listCmd = &cobra.Command{
 		if err != nil {
 			sugar.Fatalf("Error walking directory: %s", err)
 		}
-
-		// matches, _ := filepath.Glob(baseDir + "/**/.git/hooks/*")
-		// sugar.Debugf("Found %d hooks", len(matches))
-		// sugar.Debug(matches)
 	},
 }
 
