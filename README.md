@@ -14,7 +14,7 @@ After uninstalling [`git-secrets`](https://github.com/awslabs/git-secrets), [dev
 ```shell
 go mod init git-secrets-hooks-cleaner
 cobra-cli init
-go run main.go
+go run main.go list
 
 go build
 ./git-secrets-hooks-cleaner
